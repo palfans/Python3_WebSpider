@@ -11,6 +11,7 @@ from tqdm import tqdm
 from colorama import init, Fore
 import pymongo
 import time
+import re
 
 init(autoreset=True)
 
@@ -101,10 +102,12 @@ def parse_data(response):
             div.find('.post_item_foot').text().split()[3],
             # 评论数
             'comment_counts':
-            div.find('.article_comment .gray').text(),
+            re.findall(r".*\((.*)\).*",
+                       div.find('.article_comment .gray').text())[0],
             # 阅读量
             'read_counts':
-            div.find('.article_view .gray').text(),
+            re.findall(r".*\((.*)\).*",
+                       div.find('.article_view .gray').text())[0],
         }
         data.append(_data)
     return data
@@ -134,7 +137,7 @@ def main(url, page=''):
 
 
 if __name__ == '__main__':
-    total = 2
+    total = 1
     print(Fore.RED + '提示：本次抓取范围仅限博客园最新文章, 测试仅抓取前' + str(total) + '页数据！\n')
     global url
     for i in tqdm(range(total), desc='抓取进度', ncols=100):
